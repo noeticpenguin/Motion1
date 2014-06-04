@@ -25,7 +25,7 @@ Motion1 utilizes RubyMotion to present X number of windows to the user, each wit
 I hate Chatter desktop. Actually thats not true. I don't like flex / flash and the adobe bit that powers Chatter desktop has always poked my "can you do it better?" brain spot. Additionally, I wanted something that was multi-org. I didn't want to keep multipe browser's or multiple private browsing tabs open to stay in touch with the 5 orgs I'm regularly in. This is a step in the right direction at least. In additition to it's utility as a replacement for Chatter desktop, here are some other things you can do with it:
 + It's a much more lightweight "simulator" when your developing a SF1 mobile app. 
 + It's a great way to have multiple logins (as different roles / profiles) into the same org to see how objects and apps behave
-+ It's resizeable to emulate various Android screen sizes/resolutions
++ It's resizable to emulate various Android screen sizes/resolutions
 
 ## How can I help?
 + File bug reports that tell me how to reproduce the issue regardless of the org I log into. If an issue is only reproduceable in your org ... hard to help. You can file issues here: [https://github.com/noeticpenguin/Motion1/issues]
