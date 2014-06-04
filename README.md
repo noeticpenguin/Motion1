@@ -1,6 +1,9 @@
 Motion1
 =======
 
+## Where can I get it ?
+here: [https://copy.com/K6lO8BroQG4qrWo8]
+
 Salesforce1 is a revolutionary new interface for Salesforce that is not only gorgeous, but for many use cases it's faster! Unfortunately, Salesforce1 is understood by many to be a mobile only interface, available only on iOS and Android devices. Motion1 changes that. With Motion1, Mac users running OS X on their desktops and laptops, can securely log into their Salesforce orgs and utilize the Salesforce1 interface. 
 
 ## All the features of Salesforce1 that we've come to know and love are present here: 
