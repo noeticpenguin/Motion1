@@ -8,18 +8,20 @@ class MainController < NSWindowController
   def generate_login_url end_point
     case end_point
     when "prod"
-      @end_point = "https://login.salesforce.com?retURL=/one/one.app"
+      @end_point = "https://login.salesforce.com"
       @window_title = "Production Org"
     when "sandbox" 
-      @end_point = "https://test.salesforce.com?retURL=/one/one.app"
+      @end_point = "https://test.salesforce.com"
       @window_title = "Sandbox Org"
     when "pre"
-      @end_point = "https://gs0.salesforce.com?retURL=/one/one.app"
+      @end_point = "https://gs0.salesforce.com"
       @window_title = "Pre-Release Org"
     else
-      @end_point = "https://login.salesforce.com?retURL=/one/one.app"
+      @end_point = "https://login.salesforce.com"
       @window_title = "Production Org"
     end
+    # Per PR-1, i've changed this from retURL to startURL to support SSO 
+    @end_point += "?startURL=/one/one.app"
   end
 
   def init end_point
