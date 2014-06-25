@@ -4,6 +4,10 @@ GEM
     activesupport (3.2.18)
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
+    awesome_print_motion (0.1.0)
+    bubble-wrap (1.6.0)
+      bubble-wrap-http (= 1.6.0)
+    bubble-wrap-http (1.6.0)
     colored (1.2)
     i18n (0.6.9)
     ib (0.4.7)
@@ -23,6 +27,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print_motion
+  bubble-wrap
   ib
   menu-motion
   rake

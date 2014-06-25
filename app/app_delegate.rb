@@ -1,5 +1,5 @@
 class AppDelegate
-  attr_accessor :array_of_windows
+  attr_accessor :array_of_windows, :mainWindow
   
   def applicationDidFinishLaunching(notification)
     buildMenu
@@ -7,26 +7,8 @@ class AppDelegate
   end
 
   def buildWindow
-    @mainWindow = MainController.alloc.init('prod')
+    @mainWindow  = MainController.alloc.initWithWindowNibName("M1MainWindow")
     @mainWindow.showWindow(self)
-  end
-
-  def newProductionConnection(sender)
-    @array_of_windows = [] if @array_of_windows.nil?
-    @array_of_windows << MainController.alloc.init('prod')
-    @array_of_windows.last.showWindow(self)
-  end
-
-  def newSandboxConnection(sender)
-    @array_of_windows = [] if @array_of_windows.nil?
-    @array_of_windows << MainController.alloc.init('sandbox')
-    @array_of_windows.last.showWindow(self)
-  end
-
-  def newPreReleaseConnection(sender)
-    @array_of_windows = [] if @array_of_windows.nil?
-    @array_of_windows << MainController.alloc.init('pre')
-    @array_of_windows.last.showWindow(self)
   end
 
 end
