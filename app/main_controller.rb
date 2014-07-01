@@ -5,6 +5,7 @@ class MainController < NSWindowController
   outlet :useSmallRowHeight, NSButton
   outlet :webViewContainer, NSView
   outlet :webViewMaster, WebView 
+  outlet :splitView, NSSplitView 
   
   attr_accessor :tableContents, 
                 :observedVisibleItems, 
@@ -43,11 +44,13 @@ class MainController < NSWindowController
       end
     end
 
-    production_divider = M1OrgDivider.new
-    production_divider.title = "Production"
-    @tableContents.insertObject(production_divider, atIndex:index)
+    # production_divider = M1OrgDivider.new
+    # production_divider.title = "Production"
+    # @tableContents.insertObject(production_divider, atIndex:index)
 
-    @tableContents.insertObject(entity, atIndex:index+1)
+    # @tableContents.insertObject(entity, atIndex:index+1)
+    @tableContents << entity
+    swapOutView(0)
 
     @webViews = [];
     @tableViewMain.setGridStyleMask(NSTableViewSolidHorizontalGridLineMask)
@@ -62,11 +65,15 @@ class MainController < NSWindowController
     @tableViewMain.reloadData
     @tableViewMain.setDraggingSourceOperationMask(NSDragOperationEvery, forLocal:false)
     @useSmallRowHeight = false
-
+    @splitView.setDelegate(self)
   end
 
-   def entityForRow(row)
+  def entityForRow(row)
     return @tableContents.objectAtIndex(row)
+  end
+
+  def refreshTable()
+    @tableViewMain.reloadData
   end
 
   def imageEntityForRow(row)
@@ -170,25 +177,26 @@ class MainController < NSWindowController
   end
 
   def tableViewSelectionDidChange(aNotification)
-    ap aNotification
-    ap tableViewMain.selectedRow
-    
+    swapOutView(@tableViewMain.selectedRow)
   end
 
   def tableView(tableView, selectionIndexesForProposedSelection:proposedSelectionIndexes)
-    ap "firing tableView:selectionIndexesForProposedSelection"
-    ap proposedSelectionIndexes
     return proposedSelectionIndexes
   end
 
+  def swapOutView(selection)
+    rowObj = entityForRow(selection)
+    rowObj = entityForRow(0) unless rowObj
+    webViewContainerSubviews = App.delegate.mainWindow.webViewContainer.subviews
+    App.delegate.mainWindow.webViewContainer.replaceSubview(webViewContainerSubviews.first, with:rowObj.webView)
+
+  end
+
   def splitView(splitView, constrainMinCoordinate:proposedMinimumPosition, ofSubviewAt:dividerIndex)
-    NSLog("Inside Splitview:constrainMinCoordinate:ofSubviewAt")
-    return 200
+    return 260
   end
 
   def splitView(splitView, constrainMaxCoordinate:proposedMaximumPosition, ofSubviewAt:dividerIndex)
-    NSLog("Inside Splitview:constrainMaxCoordinate:ofSubviewAt")
-    # Make sure the view on the right has at least 200 px wide
     splitViewWidth = splitView.bounds.size.width
     return splitViewWidth - 200
   end
@@ -306,10 +314,10 @@ class MainController < NSWindowController
   end
 
   def tblvwDoubleClick(sender)
-    row = @tableViewMain.selectedRow
-    if (row != -1)
-      entity = entityForRow(row)
-    end
+    # row = @tableViewMain.selectedRow
+    # if (row != -1)
+    #   entity = entityForRow(row)
+    # end
   end
 
   def tableView(tableView, pasteboardWriterForRow:row)

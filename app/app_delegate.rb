@@ -4,6 +4,9 @@ class AppDelegate
   def applicationDidFinishLaunching(notification)
     buildMenu
     buildWindow
+
+    NSUserDefaults.standardUserDefaults.setBool(TRUE, forKey:"WebKitDeveloperExtras")
+    NSUserDefaults.standardUserDefaults.synchronize
   end
 
   def buildWindow

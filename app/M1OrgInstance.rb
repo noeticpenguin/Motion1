@@ -8,6 +8,8 @@ class M1OrgInstance < M1Org
                 :title,
                 :webView,
                 :endPoint,
+                :username,
+                :safeToRefresh,
                 :superFrameSize
 
   THUMBNAIL_HEIGHT=180.0
@@ -46,13 +48,63 @@ class M1OrgInstance < M1Org
 
     @superFrameSize = App.delegate.mainWindow.webViewContainer.frameSize
     @webView = WebView.alloc.initWithFrame([[0,0],[@superFrameSize.width,@superFrameSize.height]], frameName:"m1", groupName:"m1")
-    ap "frame size = #{@webView.frameSize.width} x #{@webView.frameSize.height}"
+    @webView.setCustomUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 1094) AppleWebKit/537.77.4 (KHTML like Gecko) Version/7.0.5 Safari/537.77.4")
+    @webView.setResourceLoadDelegate(self)
+    @webView.setAutoresizingMask(NSViewWidthSizable | NSViewHeightSizable | NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin)
+    @webViewUIdelegate = M1WebViewUIDelegate.new
+    @webView.setUIDelegate(@webViewUIdelegate)
+    @webView.setFrameLoadDelegate(self)
     load
     return self
   end
 
+  def webViewAreToolbarsVisible
+    ap "test"
+  end
+
+  def M1OrgInstance.isSelectorExcludedFromWebScript(name)
+    return false if name == :setUsername
+  end
+
+  def M1OrgInstance.isKeyExcludedFromWebScript(name)
+    return false if name == "m1u"
+  end
+
+  def webView(sender, didClearWindowObject:windowObject, forFrame:frame)
+    @webView.windowScriptObject.setValue(self, forKey:"m1u");
+    inject_javascript_for_username_capture()
+  end
+
+  def setUsername(username)
+    @username = username
+    @title = username
+    App.delegate.mainWindow.refreshTable
+  end
+
+  def safeToRefresh(safeToRefresh)
+    @safeToRefresh = safeToRefresh
+  end
+
+  def inject_javascript_for_username_capture
+    ap "injecting jQuery"
+    path = NSBundle.mainBundle.pathForResource("jquery", ofType:"js")
+    jQuery = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
+    @webView.stringByEvaluatingJavaScriptFromString(jQuery)
+    
+    ap "injecting and executing m1 scripts"
+    path = NSBundle.mainBundle.pathForResource("m1Scripts", ofType:"js")
+    m1Scripts = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
+    @webView.stringByEvaluatingJavaScriptFromString(m1Scripts)
+
+    ap "Injecting are you sure.js"
+    path = NSBundle.mainBundle.pathForResource("areYouSure", ofType:"js")
+    areYouSure = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
+    @webView.stringByEvaluatingJavaScriptFromString(areYouSure)
+  end
+
   def load
-    request = NSURLRequest.requestWithURL(NSURL.URLWithString(@endPoint))
+    request = NSMutableURLRequest.requestWithURL(NSURL.URLWithString(@endPoint))
+    request.setHTTPShouldUsePipelining(true)
     @webView.mainFrame.loadRequest(request)
   end
 
