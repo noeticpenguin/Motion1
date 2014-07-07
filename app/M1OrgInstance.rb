@@ -9,7 +9,6 @@ class M1OrgInstance < M1Org
                 :webView,
                 :endPoint,
                 :username,
-                :safeToRefresh,
                 :superFrameSize
 
   THUMBNAIL_HEIGHT=180.0
@@ -54,16 +53,27 @@ class M1OrgInstance < M1Org
     @webViewUIdelegate = M1WebViewUIDelegate.new
     @webView.setUIDelegate(@webViewUIdelegate)
     @webView.setFrameLoadDelegate(self)
+    setupTimer
     load
+    NSNotificationCenter.defaultCenter.addObserver(self, selector:scrollDetected, name:NSViewBoundsDidChangeNotification, object:@webView)
     return self
   end
 
-  def webViewAreToolbarsVisible
-    ap "test"
+  def scrollDetected
+    ap "scroll detected";
+  end
+
+  def setupTimer
+   NSTimer.scheduledTimerWithTimeInterval(180, target:self, selector:"refresh", userInfo:nil, repeats:true)
+  end
+
+  def webView(sender, didFinishLoadForFrame:frame)
+    # ap "Frame did load. #{frame}"
   end
 
   def M1OrgInstance.isSelectorExcludedFromWebScript(name)
     return false if name == :setUsername
+    return false if name == :setSafeToRefresh
   end
 
   def M1OrgInstance.isKeyExcludedFromWebScript(name)
@@ -81,35 +91,31 @@ class M1OrgInstance < M1Org
     App.delegate.mainWindow.refreshTable
   end
 
-  def safeToRefresh(safeToRefresh)
-    @safeToRefresh = safeToRefresh
+  def refresh()
+    wso = @webView.windowScriptObject.callWebScriptMethod('safeToReload', withArguments:[]);
+    if(wso)
+      @webView.reload(1)
+    end
+  end
+
+  def webView(sender, didChangeLocationWithinPageForFrame:frame)
+    ap "did change location within page for frame"
   end
 
   def inject_javascript_for_username_capture
-    ap "injecting jQuery"
     path = NSBundle.mainBundle.pathForResource("jquery", ofType:"js")
     jQuery = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
     @webView.stringByEvaluatingJavaScriptFromString(jQuery)
-    
-    ap "injecting and executing m1 scripts"
+  
     path = NSBundle.mainBundle.pathForResource("m1Scripts", ofType:"js")
     m1Scripts = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
     @webView.stringByEvaluatingJavaScriptFromString(m1Scripts)
-
-    ap "Injecting are you sure.js"
-    path = NSBundle.mainBundle.pathForResource("areYouSure", ofType:"js")
-    areYouSure = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
-    @webView.stringByEvaluatingJavaScriptFromString(areYouSure)
   end
 
   def load
     request = NSMutableURLRequest.requestWithURL(NSURL.URLWithString(@endPoint))
     request.setHTTPShouldUsePipelining(true)
     @webView.mainFrame.loadRequest(request)
-  end
-
-  def NSViewFrameDidChangeNotification(sender)
-    ap "NSViewFrameDidChangeNotification happened"
   end
 
   # static NSImage *M1thumbnailImageFromImage(NSImage *image) {
